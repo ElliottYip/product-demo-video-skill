@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Small ffprobe-compatible read-only fallback backed by ffmpeg stderr metadata."""
+from __future__ import annotations
+
+import json
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        return 1
+    source = Path(sys.argv[-1])
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg or not source.exists():
+        return 1
+    proc = subprocess.run([ffmpeg, "-hide_banner", "-i", str(source), "-f", "null", "-"], text=True, capture_output=True)
+    text = proc.stderr
+    duration_match = re.search(r"Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)", text)
+    duration = 0.0
+    if duration_match:
+        duration = int(duration_match.group(1)) * 3600 + int(duration_match.group(2)) * 60 + float(duration_match.group(3))
+    streams: list[dict] = []
+    video = re.search(r"Video:\s*([^,]+).*?\s(\d{2,6})x(\d{2,6})(?:[,\s])", text)
+    if video:
+        fps_match = re.search(r"(?:,|\s)(\d+(?:\.\d+)?)\s+fps(?:,|\s)", text)
+        fps = float(fps_match.group(1)) if fps_match else 30.0
+        frame_count = max(1, round(duration * fps)) if duration else 1
+        streams.append({"index": len(streams), "codec_type": "video", "codec_name": video.group(1).strip(), "width": int(video.group(2)), "height": int(video.group(3)), "duration": str(duration) if duration else None, "avg_frame_rate": f"{round(fps * 1000)}/1000", "r_frame_rate": f"{round(fps * 1000)}/1000", "nb_frames": str(frame_count), "nb_read_frames": str(frame_count)})
+    audio = re.search(r"Audio:\s*([^,]+),\s*(\d+)\s*Hz,\s*([^,]+)", text)
+    if audio:
+        channels = 1 if "mono" in audio.group(3).lower() else 2
+        streams.append({"index": len(streams), "codec_type": "audio", "codec_name": audio.group(1).strip(), "sample_rate": audio.group(2), "channels": channels, "duration": str(duration) if duration else None})
+    payload = {"streams": streams, "format": {"filename": str(source), "duration": str(duration), "size": str(source.stat().st_size)}}
+    args = " ".join(sys.argv[1:])
+    if "json" in args:
+        print(json.dumps(payload))
+    elif "format=duration" in args or "duration" in args:
+        print(f"{duration:.6f}")
+    elif video:
+        print(f"{video.group(2)}x{video.group(3)}")
+    else:
+        print(json.dumps(payload))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

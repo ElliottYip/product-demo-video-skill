@@ -1,0 +1,10 @@
+{
+  "name": "clean-evidence-portrait",
+  "canvas": {"width": 1080, "height": 1920, "fps": 30, "background": "#0B1020"},
+  "safe_area": {"left": 72, "right": 72, "top": 160, "bottom": 260},
+  "web_frame": {"x": 60, "y": 240, "width": 960, "height": 1190, "corner_radius": 32},
+  "caption": {"x": 90, "y": 1480, "width": 900, "max_lines": 3, "font_size": 54, "line_height": 1.18, "color": "#FFFFFF", "shadow": "#000000B0"},
+  "source_badge": {"x": 72, "y": 166, "font_size": 28, "background": "#111827DD", "color": "#D1D5DB"},
+  "highlight": {"stroke": "#FACC15", "stroke_width": 8, "fill": "#FACC151C"},
+  "fonts": ["PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Arial Unicode MS"]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Product Kinetic Video V3"
+  short_description: "Build verified kinetic AI product videos"
+  default_prompt: "Use $ai-product-screenshot-video-v3 to turn this AI-product topic into a kinetic listicle video with verified claims and synchronized Chinese narration."

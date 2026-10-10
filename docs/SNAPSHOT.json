@@ -1,0 +1,11 @@
+{
+  "snapshot_date": "2026-10-10",
+  "entries": [
+    {
+      "skill": "ai-product-screenshot-video-v3",
+      "source_skill_sha256": "8fe3b5cb0ef8f1e9f8717486db6c179de6921672bdbe37ff192dcbcf38f03609",
+      "snapshot_date": "2026-10-10",
+      "file_count": 33
+    }
+  ]
+}
